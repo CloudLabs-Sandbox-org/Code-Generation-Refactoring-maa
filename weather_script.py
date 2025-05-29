@@ -22,10 +22,14 @@ def fetch_weather(city_name, api_key):
     }
     try:
         response = requests.get(base_url, params=params)
+        print(f"Debug - API URL: {response.url}")
+        print(f"Debug - Status Code: {response.status_code}")
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
         print(f"Error fetching weather data: {e}")
+        if hasattr(e.response, 'text'):
+            print(f"Error response: {e.response.text}")
         return None
 
 def main():
@@ -34,12 +38,16 @@ def main():
     if not api_key:
         print("API key not found in .env file.")
         return
-
+    
+    print(f"Debug - Using API key: {api_key}")  # Add this line to verify the key
+    
     city_name = input("Enter city name: ")
     weather = fetch_weather(city_name, api_key)
     if weather:
-        print(f"Weather in {city_name}:")
-        print(weather)
+        print(f"\nWeather in {city_name}:")
+        print(f"Temperature: {weather['main']['temp']}°C")
+        print(f"Conditions: {weather['weather'][0]['description']}")
+        print(f"Humidity: {weather['main']['humidity']}%")
     else:
         print("Failed to fetch weather data.")
 
